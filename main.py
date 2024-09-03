@@ -11,21 +11,66 @@
 # - Räkna antalet unika ord (alltså ord som bara förekommer en gång)
 
 
-def read_from_file(path: str):
-    """Reads a file with the given parameter path and returns the file as a list of strings, split on newline (\n).
+import re
+from collections import Counter
+import os
 
-    Args:
-        path (str): the path of the readable file
+def read_from_file(filename: str) -> str:
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(script_dir, filename)
+    
+    print(f"Försöker öppna fil: {file_path}")
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            return file.read()
+    except FileNotFoundError:
+        print(f"Filen '{filename}' kunde inte hittas. Kontrollera att filen finns i samma katalog som skriptet.")
+        return ""
 
-    Returns:
-        list(str): list of strings
-    """
-    with open(path, "r" ,encoding="utf-8") as f:
-        return f.readlines()
+def count_words(text: str) -> int:
+    return len(re.findall(r'\w+', text))
+
+def most_frequent_word(text: str) -> str:
+    words = re.findall(r'\w+', text.lower())
+    return Counter(words).most_common(1)[0][0]
+
+def average_word_length(text: str) -> float:
+    words = re.findall(r'\w+', text)
+    return sum(len(word) for word in words) / len(words)
+
+def longest_and_shortest_words(text: str) -> tuple:
+    words = re.findall(r'\w+', text)
+    longest = max(words, key=len)
+    shortest = min(words, key=len)
+    return longest, shortest
+
+def count_unique_words(text: str) -> int:
+    words = re.findall(r'\w+', text.lower())
+    return sum(1 for word, count in Counter(words).items() if count == 1)
 
 def main():
+    filename = "en_resa_genom_svenska_skogen.txt"
+    text = read_from_file(filename)
     
-    sentences = read_from_file("en_resa_genom_svenska_skogen.txt") # Här har du nu en lista av strängar från den inlästa filen.
+    if not text:
+        return 
+    
+    word_count = count_words(text)
+    print(f"Antal ord: {word_count}")
+    
+    frequent_word = most_frequent_word(text)
+    print(f"Mest frekventa ord: {frequent_word}")
+    
+    avg_length = average_word_length(text)
+    print(f"Genomsnittlig ordlängd: {avg_length:.2f}")
+    
+    longest, shortest = longest_and_shortest_words(text)
+    print(f"Längsta ordet: {longest}")
+    print(f"Kortaste ordet: {shortest}")
+    
+    unique_count = count_unique_words(text)
+    print(f"Antal unika ord: {unique_count}")
 
 if __name__ == "__main__":
     main()
